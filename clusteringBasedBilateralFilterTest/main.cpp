@@ -372,12 +372,12 @@ void testClusteringHDGF_SpringerNature(string wname)
 	//cv::Size division(2, 2);
 	//cv::Size division(1, 1);
 
-	//int methodHDGF = RGB;
-	//int methodHDGF = RGBD;
-	//int methodHDGF = RGBIR;
-	//int methodHDGF = FNF;
-	//int methodHDGF = HSI;
-	int typeHDGF = NLM;
+	int typeHDGF = RGB;
+	//int typeHDGF = RGBD;
+	//int typeHDGF = RGBIR;
+	//int typeHDGF = FNF;
+	//int typeHDGF = HSI;
+	//int typeHDGF = NLM;
 	createTrackbar("HDGF method", wname2, &typeHDGF, 5);
 	//int clusteringHDGFMethod = 0; //interpolation
 	int clusteringHDGFMethod = 1; //Nystrom
@@ -533,7 +533,7 @@ void testClusteringHDGF_SpringerNature(string wname)
 #ifdef VIS_TILING_PCA
 	int test = 0; createTrackbar("test", "", &test, 1);
 #endif
-	int src_num = 2; createTrackbar("src_num", wname2, &src_num, 9);
+	int src_num = 0; createTrackbar("src_num", wname2, &src_num, 9);
 	int lambda = 100; createTrackbar("lambda", wname2, &lambda, 100);
 	//convmethod = "interpolation NLM" sw=11;
 	int sw1 = 2; createTrackbar("sw1", wname2, &sw1, 8); setTrackbarMin("sw1", wname2, -1);
@@ -542,7 +542,7 @@ void testClusteringHDGF_SpringerNature(string wname)
 
 	int showIndex = 0; createTrackbar("showIndex", wname2, &showIndex, 2);
 	int alpha = 0; createTrackbar("a", wname2, &alpha, 100);
-	int dboost = 5; createTrackbar("diff: 2^n", wname2, &dboost, 10);
+	int dboost = 0; createTrackbar("diff: 2^n", wname2, &dboost, 10);
 
 	int sigma_space = 3; createTrackbar("ss", wname2, &sigma_space, 32);
 	int sigma_range = 40; createTrackbar("sr", wname2, &sigma_range, 255);
@@ -572,15 +572,15 @@ void testClusteringHDGF_SpringerNature(string wname)
 	int ds_method = DownsampleMethod::IMPORTANCE_MAP;
 	createTrackbar("downsample method", wname2, &ds_method, DownsampleMethod::DownsampleMethodSize - 1);
 	int crop = 1; createTrackbar("isCropClustering", wname2, &crop, 1);
-	int tilex = 2; createTrackbar("tilex", wname2, &tilex, 5);
-	int tiley = 2; createTrackbar("tiley", wname2, &tiley, 5);
+	int tilex = 3; createTrackbar("tilex", wname2, &tilex, 5);
+	int tiley = 3; createTrackbar("tiley", wname2, &tiley, 5);
 	int softlambda = 50; createTrackbar("soft:lambda*0.001", wname2, &softlambda, 2000);
 	int localmu = 1; createTrackbar("isLocalMu", wname2, &localmu, 1);
 	int localsp = 0; createTrackbar("isLocalSP", wname2, &localsp, 1);
 	int localsp_delta = 0; createTrackbar("LocalSP delta", wname2, &localsp_delta, 1000);
 	int nlm_r = 1;
 	int max_dim = (2 * nlm_r + 1) * (2 * nlm_r + 1) * src[0].channels();
-	int pca_channel = 10; createTrackbar("pca_ch", wname2, &pca_channel, max_dim); setTrackbarMin("pca_ch", wname2, 1);
+	int pca_channel = 1; createTrackbar("pca_ch", wname2, &pca_channel, max_dim); setTrackbarMin("pca_ch", wname2, 1);
 	int pca_method1 = 0; createTrackbar("pca_method1", wname2, &pca_method1, (int)NeighborhoodPCA::SIZE - 1);
 
 	int border = cv::BORDER_DEFAULT; createTrackbar("border", wname2, &border, 4);
@@ -619,9 +619,9 @@ void testClusteringHDGF_SpringerNature(string wname)
 	Mat input32f;
 	Mat guide4Filter;
 	int key = 0;
-	//const int methodNum = 1;
+	const int methodNum = 1;
 	//const int methodNum = 2;
-	const int methodNum = 3;
+	//const int methodNum = 3;
 	double timeref = 0.0;
 	double timeref_fullpca = 0.0;
 	double timeref_tilepca = 0.0;
@@ -639,10 +639,27 @@ void testClusteringHDGF_SpringerNature(string wname)
 	Ptr<TileConstantTimeHDGF> tHDGF1 = new TileConstantTimeHDGF(maxdivision, ConstantTimeHDGF(clusteringHDGFMethod));
 	Ptr<TileConstantTimeHDGF> tHDGF2 = new TileConstantTimeHDGF(maxdivision, ConstantTimeHDGF(clusteringHDGFMethod));
 	Ptr<TileConstantTimeHDGF> tHDGF3 = new TileConstantTimeHDGF(maxdivision, ConstantTimeHDGF(clusteringHDGFMethod));
+	cp::Plot pt(Size(512, 512));
+	pt.setXYRange(0, 50, 20, 70);
+	pt.setXLabel("K");
+	pt.setYLabel("PSNR [dB]");
+	pt.setLogScaleX(true);
+
+	int idx = 0;
+	int num = 0;
+	pt.setPlotTitle(idx++, "1-ch.");
+	pt.setPlotTitle(idx++, "2-ch.");
+	pt.setPlotTitle(idx++, "3-ch.");
+	idx = 0;
+
+	int k_index = 0;
+	vector<int> test_k = { 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 };
+	double mean = 0;
 
 #pragma endregion
 	while (key != 'q')
 	{
+		K_ = test_k[k_index];
 		bool isClear = false;
 
 		if (ucRecomputeRef.isUpdate(sigma_range, sigma_space, src_num, typeHDGF, pca_channel, pca_method1, lambda, tilex, tiley, clusteringHDGFMethod, border))
@@ -662,7 +679,7 @@ void testClusteringHDGF_SpringerNature(string wname)
 				src[src_num].convertTo(src32, CV_32F);
 				src[src_num].convertTo(guide32f, CV_32F);
 			}
-			/*else if (methodHDGF == GIR)
+			/*else if (typeHDGF == GIR)
 			{
 				src_gir_g[src_num].convertTo(src32, CV_32F);
 				mergeConvertImage(src_gir_g[src_num], src_gir_ir[src_num], guide32f, lambda * 0.01, CV_32F);
@@ -1111,9 +1128,47 @@ void testClusteringHDGF_SpringerNature(string wname)
 		ci.show();
 		//psnr.drawDistribution("psnr");
 		//t.drawDistribution("time");
-	}
-}
+		if (num++ == 100)
+		{
+			mean += psnr1.getMean();
 
+			src_num++;
+			if (src_num == imgNum)
+			{
+				pt.push_back(K_, mean / (double)imgNum, idx);
+				src_num = 0;
+				k_index++;
+				mean = 0.;
+			}
+			if (k_index == test_k.size())
+			{
+				k_index = 0;
+				pca_channel++;
+				idx++;
+			}
+			if (idx == 3)
+			{
+				pt.plot("Plot");
+				break;
+			}
+			num = 0;
+
+			t1.clearStat();
+			t2.clearStat();
+			t3.clearStat();
+			tpca.clearStat();
+			psnr1.clear();
+			psnr2.clear();
+			psnr3.clear();
+			psnrsrc.clear();
+			for (int i = 0; i < maxdivision.area(); i++)
+			{
+				psnr_tile1[i].clear();
+				psnr_tile2[i].clear();
+			}
+		}
+}
+}
 int main()
 {
 	testClusteringHDGF_SpringerNature("Test ClusteringHDGF NSCS");
