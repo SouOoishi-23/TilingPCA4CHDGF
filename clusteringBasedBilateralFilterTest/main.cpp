@@ -372,12 +372,12 @@ void testClusteringHDGF_SpringerNature(string wname)
 	//cv::Size division(2, 2);
 	//cv::Size division(1, 1);
 
-	int typeHDGF = RGB;
+	//int typeHDGF = RGB;
 	//int typeHDGF = RGBD;
 	//int typeHDGF = RGBIR;
 	//int typeHDGF = FNF;
 	//int typeHDGF = HSI;
-	//int typeHDGF = NLM;
+	int typeHDGF = NLM;
 	createTrackbar("HDGF method", wname2, &typeHDGF, 5);
 	//int clusteringHDGFMethod = 0; //interpolation
 	int clusteringHDGFMethod = 1; //Nystrom
@@ -580,7 +580,7 @@ void testClusteringHDGF_SpringerNature(string wname)
 	int localsp_delta = 0; createTrackbar("LocalSP delta", wname2, &localsp_delta, 1000);
 	int nlm_r = 1;
 	int max_dim = (2 * nlm_r + 1) * (2 * nlm_r + 1) * src[0].channels();
-	int pca_channel = 1; createTrackbar("pca_ch", wname2, &pca_channel, max_dim); setTrackbarMin("pca_ch", wname2, 1);
+	int pca_channel = 4; createTrackbar("pca_ch", wname2, &pca_channel, max_dim); setTrackbarMin("pca_ch", wname2, 1);
 	int pca_method1 = 0; createTrackbar("pca_method1", wname2, &pca_method1, (int)NeighborhoodPCA::SIZE - 1);
 
 	int border = cv::BORDER_DEFAULT; createTrackbar("border", wname2, &border, 4);
@@ -647,18 +647,18 @@ void testClusteringHDGF_SpringerNature(string wname)
 
 	int idx = 0;
 	int num = 0;
-	pt.setPlotTitle(idx++, "1-ch.");
-	pt.setPlotTitle(idx++, "2-ch.");
-	pt.setPlotTitle(idx++, "3-ch.");
-	
-	/*pt.setPlotTitle(idx++, "7-ch.");
+	pt.setPlotTitle(idx++, "4-ch.");
+	pt.setPlotTitle(idx++, "5-ch.");
+	pt.setPlotTitle(idx++, "6-ch.");
+	pt.setPlotTitle(idx++, "7-ch.");
 	pt.setPlotTitle(idx++, "8-ch.");
 	pt.setPlotTitle(idx++, "9-ch.");
-	pt.setPlotTitle(idx++, "10-ch.");*/
+	pt.setPlotTitle(idx++, "10-ch.");
+	const int max_idx = idx;
 	idx = 0;
 
 	int k_index = 0;
-	vector<int> test_k = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 };
+	vector<int> test_k = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1000 };
 	double mean = 0;
 	const int test_count = 20;
 
@@ -1152,7 +1152,7 @@ void testClusteringHDGF_SpringerNature(string wname)
 				pca_channel++;
 				idx++;
 			}
-			if (idx == 3)
+			if (idx == max_idx)
 			{
 				pt.plot("Plot");
 				break;
