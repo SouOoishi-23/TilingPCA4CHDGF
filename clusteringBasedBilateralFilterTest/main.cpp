@@ -567,7 +567,7 @@ void testClusteringHDGF_SpringerNature(string wname)
 	//int cm = (int)ClusterMethod::K_means_mediancut;
 	//int cm = ClusterMethod::X_means; 
 	createTrackbar("ClusterMethod", wname2, &cm, (int)ClusterMethod::Size - 1);
-	int ds = 2; createTrackbar("downsample 2^n", wname2, &ds, 5);
+	int ds = 1; createTrackbar("downsample 2^n", wname2, &ds, 5);
 	//int ds_method = INTER_NEAREST;
 	int ds_method = DownsampleMethod::IMPORTANCE_MAP;
 	createTrackbar("downsample method", wname2, &ds_method, DownsampleMethod::DownsampleMethodSize - 1);
@@ -650,16 +650,22 @@ void testClusteringHDGF_SpringerNature(string wname)
 	pt.setPlotTitle(idx++, "1-ch.");
 	pt.setPlotTitle(idx++, "2-ch.");
 	pt.setPlotTitle(idx++, "3-ch.");
+	
+	/*pt.setPlotTitle(idx++, "7-ch.");
+	pt.setPlotTitle(idx++, "8-ch.");
+	pt.setPlotTitle(idx++, "9-ch.");
+	pt.setPlotTitle(idx++, "10-ch.");*/
 	idx = 0;
 
 	int k_index = 0;
-	vector<int> test_k = { 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 };
+	vector<int> test_k = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 };
 	double mean = 0;
+	const int test_count = 20;
 
 #pragma endregion
 	while (key != 'q')
 	{
-		K_ = test_k[k_index];
+		K_ = test_k[test_k.size() - k_index - 1];
 		bool isClear = false;
 
 		if (ucRecomputeRef.isUpdate(sigma_range, sigma_space, src_num, typeHDGF, pca_channel, pca_method1, lambda, tilex, tiley, clusteringHDGFMethod, border))
@@ -1128,7 +1134,7 @@ void testClusteringHDGF_SpringerNature(string wname)
 		ci.show();
 		//psnr.drawDistribution("psnr");
 		//t.drawDistribution("time");
-		if (num++ == 100)
+		if (num++ == test_count)
 		{
 			mean += psnr1.getMean();
 
@@ -1167,7 +1173,7 @@ void testClusteringHDGF_SpringerNature(string wname)
 				psnr_tile2[i].clear();
 			}
 		}
-}
+	}
 }
 int main()
 {
