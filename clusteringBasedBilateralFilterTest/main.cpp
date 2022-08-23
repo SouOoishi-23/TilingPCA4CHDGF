@@ -375,9 +375,9 @@ void testClusteringHDGF_SpringerNature(string wname)
 	//int typeHDGF = RGB;
 	//int typeHDGF = RGBD;
 	//int typeHDGF = RGBIR;
-	//int typeHDGF = FNF;
+	int typeHDGF = FNF;
 	//int typeHDGF = HSI;
-	int typeHDGF = NLM;
+	//int typeHDGF = NLM;
 	createTrackbar("HDGF method", wname2, &typeHDGF, 5);
 	//int clusteringHDGFMethod = 0; //interpolation
 	int clusteringHDGFMethod = 1; //Nystrom
@@ -642,25 +642,23 @@ void testClusteringHDGF_SpringerNature(string wname)
 	cp::Plot pt(Size(512, 512));
 	pt.setXYRange(0, 50, 20, 70);
 	pt.setXLabel("K");
-	pt.setYLabel("PSNR [dB]");
+	pt.setYLabel("Time [ms]");
 	pt.setLogScaleX(true);
 
 	int idx = 0;
 	int num = 0;
-	pt.setPlotTitle(idx++, "4-ch.");
-	pt.setPlotTitle(idx++, "5-ch.");
-	pt.setPlotTitle(idx++, "6-ch.");
-	pt.setPlotTitle(idx++, "7-ch.");
-	pt.setPlotTitle(idx++, "8-ch.");
-	pt.setPlotTitle(idx++, "9-ch.");
-	pt.setPlotTitle(idx++, "10-ch.");
+	pt.setPlotTitle(idx++, "1-ch.");
+	pt.setPlotTitle(idx++, "2-ch.");
+	pt.setPlotTitle(idx++, "3-ch.");
+	//pt.setPlotTitle(idx++, "7-ch.");
+	
 	const int max_idx = idx;
 	idx = 0;
 
 	int k_index = 0;
-	vector<int> test_k = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1000 };
+	vector<int> test_k = { 1, 2, 4, 8, 16, 32 };// , 64, 128, 256, 512, 1000};
 	double mean = 0;
-	const int test_count = 20;
+	const int test_count = 30;
 
 #pragma endregion
 	while (key != 'q')
@@ -1115,6 +1113,7 @@ void testClusteringHDGF_SpringerNature(string wname)
 		if (isRefTilePCA)ci("naive t-PCA %7.2f ms %5.2f dB", timeref_tilepca, psnr_tilepca);
 		if (isRefTilePCA2)ci("naive t-PCA2%7.2f ms %5.2f dB", timeref_tilepca2, psnr_tilepca2);
 		if (isRefTileDCT)ci("naive t-DCT %7.2f ms %5.2f dB", timeref_tiledct, psnr_tiledct);
+		ci("PCA channel %d", pca_channel);
 		ci("PCA PSNR    %5.2f dB ", psnrpcaonly);
 		ci("time   1    Mean %7.2f MED %7.2f ms", t1.getLapTimeMean(), t1.getLapTimeMedian());
 		ci("time   2    Mean %7.2f MED %7.2f ms", t2.getLapTimeMean(), t2.getLapTimeMedian());
@@ -1134,17 +1133,23 @@ void testClusteringHDGF_SpringerNature(string wname)
 		ci.show();
 		//psnr.drawDistribution("psnr");
 		//t.drawDistribution("time");
+
+		if (num == 10)
+		{
+			t1.clearStat();
+		}
+
 		if (num++ == test_count)
 		{
-			mean += psnr1.getMean();
-
-			src_num++;
-			if (src_num == imgNum)
+			//src_num++;
+			//if (src_num == imgNum)
 			{
-				pt.push_back(K_, mean / (double)imgNum, idx);
-				src_num = 0;
+				pt.push_back(K_, t1.getLapTimeMedian(), idx);
+				pt.saveDatFile("save_rgb_time.csv", false);
+
+				//src_num = 0;
 				k_index++;
-				mean = 0.;
+				//mean = 0.;
 			}
 			if (k_index == test_k.size())
 			{
