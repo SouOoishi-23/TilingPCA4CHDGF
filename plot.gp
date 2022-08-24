@@ -6,7 +6,7 @@ set xtics (1,2,4,8,16,32,64,128,256,512,900)
 
 # y軸
 set ylabel "PSNR [dB]" font "Times New Roman, 30" offset -3,0
-set yrange [10:80]
+set yrange [10:100]
 #set logscale y
 #set ylabel "Time [ms]" font "Times New Roman, 30" offset -3,0
 #set format y "10^{%L}"
@@ -21,29 +21,31 @@ set lmargin -10
 set key right bottom font "Times New Roman, 25"
 
 # 読み込み
-input = "'test_dat/save_rgbd.dat'"
-output = "'rgbd_psnr_K.pdf'"
+input = "'test_dat/save_rgb.dat'"
+output = "'rgb_psnr_K.pdf'"
 # permutohedral lattice
-permutohedral1(x)=47.576813
-permutohedral2(x)=54.907369
-permutohedral3(x)=56.526781
+permutohedral1(x)=47.762120
+permutohedral2(x)=50.545063
+permutohedral3(x)=50.150343
 
 # gaussian kd-tree
-gauss1(x)=47.866335
-gauss2(x)=53.787291
-gauss3(x)=54.013862
+gauss1(x)=43.882041
+gauss2(x)=45.203163
+gauss3(x)=44.857090
 
 set size 0.96, 1.0
 set origin 0.04,0.0
-plot gauss1(x) title "GKDT1", \
-    gauss2(x) title "GKDT2", \
-    gauss3(x) title "GKDT3", \
-    permutohedral1(x) title "PL1", \
-    permutohedral2(x) title "PL2", \
-    permutohedral3(x) title "PL3", \
-    @input using 1:2 w l title "1-ch.", \
-    @input using 3:4 w l title "2-ch.", \
-    @input using 5:6 w l title "3-ch."
+
+# gauss2(x) title "GKDT2", \
+# permutohedral2(x) title "PL2", \
+
+plot gauss1(x) lw 2.0 lc "dark-cyan" title "GKDT1", \
+    gauss3(x) lw 2.0 lc "blue" title "GKDT3", \
+    permutohedral1(x) lc "green" lw 2.0 title "PL1", \
+    permutohedral3(x) lc "dark-green" lw 2.0 title "PL3", \
+    @input using 1:2 w l lc "magenta" lw 2.0  title "1-ch.", \
+    @input using 3:4 w l lc "orange" lw 2.0  title "2-ch.", \
+    @input using 5:6 w l lc "red" lw 2.0  title "3-ch."
 
 set term pdf 
 set output @output
