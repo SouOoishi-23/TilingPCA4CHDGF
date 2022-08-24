@@ -8,10 +8,13 @@
 
 using namespace std;
 using namespace cv;
-#pragma comment(lib,"../x64/Release/clusteringHDGF.lib")
+
 #if _DEBUG
+#pragma comment(lib,"../x64/Debug/clusteringHDGF.lib")
 #pragma comment(lib,"opencpd.lib")
+#pragma comment(lib,"SpatialFilter.lib")
 #else
+#pragma comment(lib,"../x64/Release/clusteringHDGF.lib")
 #pragma comment(lib,"opencp.lib")
 #pragma comment(lib,"SpatialFilter.lib")
 #endif
@@ -551,7 +554,7 @@ void testClusteringHDGF_SpringerNature(string wname)
 	int srcdownsample = 0; createTrackbar("src_downsample", wname2, &srcdownsample, 3);
 
 	//int K_ = 5; createTrackbar("K", wname, &K_, 5000);
-	int K_ = 10; createTrackbar("K", wname2, &K_, 1024); setTrackbarMin("K", wname2, 2);
+	int K_ = 100; createTrackbar("K", wname2, &K_, 1024); setTrackbarMin("K", wname2, 2);
 	int km_iter = 5; createTrackbar("km iter", wname2, &km_iter, 100);
 	setTrackbarMin("km iter", wname2, 1);
 	int km_attempts = 1; createTrackbar("km attempts", wname2, &km_attempts, 5);
